@@ -5,6 +5,8 @@ dotenv.config();
 const PORTA = process.env.PORTA;
 const app = express();
 
+app.use(express.json()); // Middleware para analisar o corpo da requisição como JSON
+
 const alunos = [
     {
         matricula: "a93333",
@@ -50,9 +52,23 @@ app.get("/listar/:matricula", (requisição, resposta) => {
         resposta.status(500).json({Erro: 'Erro ao listar aluno por matrícula', detalhes: error.message});
     }
 });
+
+app.post('/cadastrar', (requisição, resposta) => {
+try {
+    // Aqui você pode acessar os dados enviados no corpo da requisição
+    const { matricula, nome, email } = requisição.body;
+      const dados = {matricula, nome, email};
+    if (!matricula || !nome || !email) {
+        return resposta.status(400).json({ mensagem: 'Todos os campos são obrigatórios' });
+    }
+ 
+   alunos.push(dados);
+   resposta.status(201).json({ mensagem: 'Aluno cadastrado com sucesso'});
+} catch (error) { 
+    resposta.status(500).json({Erro: 'Erro ao cadastrar aluno', detalhes: error.message});
     
-app.listen(PORTA, () => {
-    console.log(`Servidor rodando na porta ${PORTA}`);
+}});
+    
+app.listen (PORTA, () => {
+console.log ("O Servidor está em execução!")
 });
-
-
