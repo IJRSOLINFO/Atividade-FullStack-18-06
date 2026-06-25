@@ -68,7 +68,52 @@ try {
     resposta.status(500).json({Erro: 'Erro ao cadastrar aluno', detalhes: error.message});
     
 }});
+
+app.put ('/editar/:matricula', (requisição, resposta) => {
+try {
+  const matricula = requisição.params.matricula;
+   const aluno = alunos.find(aluno => aluno.matricula === matricula);
+    if (!aluno) {
+        return resposta.status(400).json({ mensagem: 'Aluno não encontrado' });
+    }
+    // Aqui você pode acessar os dados enviados no corpo da requisição.
+    const { novoNome, novoEmail } = requisição.body;
+    if (!novoNome || !novoEmail) {
+        return resposta.status(400).json({ mensagem: 'Todos os campos são obrigatórios' });
+    }
+    aluno.nome = novoNome;
+    aluno.email = novoEmail;
+    resposta.status(200).json({ mensagem: 'Aluno atualizado com sucesso' });   
+} catch (error) {
+    resposta.status(500).json({Erro: 'Erro ao atualizar aluno', detalhes: error.message});
+}
+})
+
+app.delete('/excluir/todos', (requisição, resposta) => {
+    try {
+        alunos.length = 0;
+    resposta.status(200).json({ mensagem: 'Todos os alunos foram excluídos' });
+    } catch (error) {
+        resposta.status(500).json({Erro: 'Erro ao excluir alunos', detalhes: error.message});
+    }
     
+});
+
+app.delete('/excluir/:matricula', (requisição, resposta) => {  
+    try {
+        const matricula = requisição.params.matricula;
+        const alunoIndex = alunos.findIndex(aluno => aluno.matricula === matricula);
+        if (alunoIndex === -1) {
+            return resposta.status(400).json({ mensagem: 'Aluno não encontrado' });
+        }
+        alunos.splice(alunoIndex, 1);
+        resposta.status(200).json({ mensagem: 'Aluno excluído com sucesso' });
+
+    } catch (error) {
+        resposta.status(500).json({Erro: 'Erro ao excluir aluno', detalhes: error.message});
+    }
+});
+
 app.listen (PORTA, () => {
 console.log ("O Servidor está em execução!")
 });
